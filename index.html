@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhaleGamer - Coming Soon</title>
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            background-image: url('ocean.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            animation: pulse 5s ease infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                background-color: #000;
+            }
+            50% {
+                background-color: #001f3f;
+            }
+            100% {
+                background-color: #000;
+            }
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #fff;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        header img {
+            max-width: 200px;
+            filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8));
+            animation: wave 5s ease infinite;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            color: #48cae4;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: #94a1b2;
+        }
+
+        .glow-text {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #48cae4, 0 0 20px #48cae4, 0 0 30px #48cae4;
+            }
+            to {
+                text-shadow: 0 0 20px #48cae4, 0 0 30px #48cae4, 0 0 40px #48cae4;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <header>
+        <img src="whalegamer_logo.png" alt="WhaleGamer Logo">
+        <h1>WhaleGamer</h1>
+    </header>
+    <p>A new era of gaming is about to dawn.</p>
+    <p>Prepare for an immersive journey into the future of entertainment.</p>
+    <p><span class="glow-text">Coming Soon...</span></p>
+</div>
+
+<canvas id="starsCanvas"></canvas>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const canvas = document.getElementById('starsCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const numStars = 400; // Further reduced number of stars
+        const stars = [];
+        const maxDistance = 100;
+        const mouseNodeSize = 0.5;
+
+        // Generate stars
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                dx: Math.random() * 2 - 1,
+                dy: Math.random() * 2 - 1,
+            });
+        }
+
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+
+        document.addEventListener('mousemove', function (event) {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        });
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw stars
+            ctx.fillStyle = '#48cae4';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, 1, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw lines between stars
+            ctx.strokeStyle = '#48cae4';
+            ctx.lineWidth = 0.2;
+            stars.forEach((star, index) => {
+                for (let i = index + 1; i < stars.length; i++) {
+                    const distance = Math.sqrt((star.x - stars[i].x) ** 2 + (star.y - stars[i].y) ** 2);
+                    if (distance < maxDistance) {
+                        ctx.beginPath();
+                        ctx.moveTo(star.x, star.y);
+                        ctx.lineTo(stars[i].x, stars[i].y);
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            // Draw lines between stars and mouse position
+            ctx.strokeStyle = '#48cae4';
+            ctx.lineWidth = 0.2;
+            stars.forEach(star => {
+                const distance = Math.sqrt((star.x - mouseX) ** 2 + (star.y - mouseY) ** 2);
+                if (distance < maxDistance) {
+                    ctx.beginPath();
+                    ctx.moveTo(star.x, star.y);
+                    ctx.lineTo(mouseX, mouseY);
+                    ctx.stroke();
+                }
+            });
+
+            // Draw mouse node
+            ctx.fillStyle = 'gold';
+            ctx.beginPath();
+            ctx.arc(mouseX, mouseY, mouseNodeSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw glow effect
+            ctx.shadowColor = 'gold';
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = 'gold';
+            ctx.beginPath();
+            ctx.arc(mouseX, mouseY, mouseNodeSize * 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Move stars
+            stars.forEach(star => {
+                star.x += star.dx;
+                star.y += star.dy;
+
+                // Wrap stars around canvas edges
+                if (star.x < 0 || star.x > canvas.width) {
+                    star.x = Math.random() * canvas.width;
+                }
+                if (star.y < 0 || star.y > canvas.height) {
+                    star.y = Math.random() * canvas.height;
+                }
+            });
+
+            requestAnimationFrame(draw); // Use requestAnimationFrame for smoother animation
+        }
+
+        draw();
+    });
+</script>
+</body>
+</html>
